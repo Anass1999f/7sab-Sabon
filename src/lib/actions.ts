@@ -201,7 +201,7 @@ export async function getSettings() {
       theme: settings.theme || "dark",
       reminderDay: settings.reminderDay || 1,
       userName: settings.userName || "Anas El Jaouhari",
-      currentYear: settings.currentYear || settings.currentYear || new Date().getFullYear(),
+      currentYear: settings.currentYear || new Date().getFullYear(),
       notificationsEnabled: settings.notificationsEnabled ?? true,
       emailNotifications: settings.emailNotifications || ""
     }
@@ -214,7 +214,7 @@ export async function getSettings() {
       theme: "dark",
       reminderDay: 1,
       userName: "Anas El Jaouhari",
-      currentYear: settings.currentYear || new Date().getFullYear(),
+      currentYear: new Date().getFullYear(),
       notificationsEnabled: true,
       emailNotifications: ""
     }
