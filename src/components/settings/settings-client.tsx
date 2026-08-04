@@ -28,7 +28,7 @@ export function SettingsClient({ initialSettings }: SettingsClientProps) {
           currency: settings.currency,
           theme: settings.theme,
           savingsTarget: settings.savingsTarget,
-          currentYear: settings.currentYear,
+          currentYear: (settings as any).currentYear || new Date().getFullYear(),
         })
         toast.success("Settings saved")
       } catch {
@@ -90,7 +90,7 @@ export function SettingsClient({ initialSettings }: SettingsClientProps) {
           <label className="text-sm text-muted-foreground">Current Year</label>
           <input
             type="number"
-            value={settings.currentYear}
+            value={(settings as any).currentYear || new Date().getFullYear()}
             onChange={(e) => setSettings({ ...settings, currentYear: Number(e.target.value) })}
             className="mt-1 w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
           />

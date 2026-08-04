@@ -12,7 +12,8 @@ export default async function DashboardPage() {
   const { stats, goals, journals, activities, settings } = await getDashboardStats()
   
   // Filter goals by current year
-  const currentYearGoals = goals.filter(g => g.year === settings.currentYear)
+  const currentYear = (settings as any).currentYear || new Date().getFullYear()
+  const currentYearGoals = goals.filter(g => g.year === currentYear)
 
   return (
     <div className="space-y-8 max-w-6xl mx-auto">

@@ -12,7 +12,7 @@ export async function AppHeaderServer() {
   return (
     <AppHeader
       notifications={notifications}
-      currentYear={settings.currentYear}
+      currentYear={(settings as any).currentYear || new Date().getFullYear()}
       availableYears={years}
       onMarkRead={markNotificationRead}
       onMarkAllRead={markAllNotificationsRead}
