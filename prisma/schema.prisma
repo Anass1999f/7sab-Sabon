@@ -1,0 +1,85 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Goal {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  category    String   @default("Personal")
+  priority    String   @default("medium")
+  cost        Float    @default(0)
+  funded      Float    @default(0)
+  deadline    DateTime?
+  status      String   @default("active")
+  color       String   @default("#6366f1")
+  icon        String   @default("target")
+  year        Int      @default(2026)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([year, status])
+}
+
+model JournalEntry {
+  id              String   @id @default(cuid())
+  month           Int
+  year            Int
+  income          Float    @default(0)
+  expenses        Float    @default(0)
+  savings         Float    @default(0)
+  savingsTarget   Float    @default(0)
+  accomplishments String?
+  reflection      String?
+  mood            Int      @default(3)
+  habits          String?
+  notes           String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([month, year])
+}
+
+model Activity {
+  id        String   @id @default(cuid())
+  type      String
+  title     String
+  detail    String?
+  createdAt DateTime @default(now())
+}
+
+model Achievement {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  icon        String   @default("trophy")
+  unlockedAt  DateTime @default(now())
+  year        Int      @default(2026)
+}
+
+model Notification {
+  id          String   @id @default(cuid())
+  type        String
+  title       String
+  message     String
+  read        Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  year        Int      @default(2026)
+}
+
+model Settings {
+  id              String @id @default("default")
+  currency        String @default("EUR")
+  theme           String @default("dark")
+  reminderDay     Int    @default(1)
+  savingsTarget   Float @default(12000)
+  userName        String @default("Anas El Jaouhari")
+  currentYear     Int    @default(2026)
+  notificationsEnabled Boolean @default(true)
+  emailNotifications String @default("")
+}
