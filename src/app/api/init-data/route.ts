@@ -11,7 +11,7 @@ export async function GET() {
 
     return NextResponse.json({
       notifications,
-      currentYear: settings.currentYear,
+      currentYear: (settings as any).currentYear || new Date().getFullYear(),
       availableYears: years,
     })
   } catch (error) {
