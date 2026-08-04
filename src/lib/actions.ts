@@ -194,16 +194,17 @@ export async function getSettings() {
         } 
       })
     }
-    // Force currency to Dh and ensure all fields exist
-    return { 
-      ...settings, 
+    // Return complete settings object
+    return {
+      id: settings.id,
       currency: "Dh",
       theme: settings.theme || "dark",
       reminderDay: settings.reminderDay || 1,
       userName: settings.userName || "Anas El Jaouhari",
       currentYear: settings.currentYear || new Date().getFullYear(),
       notificationsEnabled: settings.notificationsEnabled ?? true,
-      emailNotifications: settings.emailNotifications || ""
+      emailNotifications: settings.emailNotifications || "",
+      savingsTarget: settings.savingsTarget || 120000
     }
   } catch (error) {
     console.error("Error getting settings:", error)
