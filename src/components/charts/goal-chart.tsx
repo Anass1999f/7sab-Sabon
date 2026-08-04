@@ -20,7 +20,7 @@ interface GoalChartProps {
 export function GoalChart({ goals }: GoalChartProps) {
   const chartData = goals.slice(0, 6).map((g) => ({
     name: g.title.length > 15 ? g.title.slice(0, 15) + "…" : g.title,
-    progress: g.progress,
+    progress: g.cost > 0 ? (g.funded / g.cost) * 100 : 0,
     fill: g.color,
   }))
 

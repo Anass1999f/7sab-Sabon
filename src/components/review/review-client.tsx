@@ -102,7 +102,7 @@ export function ReviewClient({ data }: ReviewClientProps) {
             <div className="space-y-2">
               {incompleteGoals.map((g) => (
                 <div key={g.id} className="rounded-2xl p-3 bg-white/5 text-sm">
-                  {g.title} <span className="text-muted-foreground">· {g.progress}%</span>
+                  {g.title} <span className="text-muted-foreground">· {g.cost > 0 ? Math.round((g.funded / g.cost) * 100) : 0}%</span>
                 </div>
               ))}
             </div>
