@@ -22,7 +22,7 @@ export async function getGoals(year = CURRENT_YEAR) {
 // Auto-allocate savings to goals based on priority
 export async function autoAllocateSavings(amount: number, year?: number) {
   const settings = await getSettings()
-  const targetYear = year || (settings as any).currentYear || new Date().getFullYear()
+  const targetYear = year || settings.currentYear
   const goals = await prisma.goal.findMany({ 
     where: { year: targetYear, status: "active" },
     orderBy: [{ priority: "desc" }, { createdAt: "asc" }]
@@ -56,7 +56,7 @@ export async function autoAllocateSavings(amount: number, year?: number) {
 // Redistribute all existing savings when a new goal is created
 export async function redistributeSavings(year?: number) {
   const settings = await getSettings()
-  const targetYear = year || (settings as any).currentYear || new Date().getFullYear()
+  const targetYear = year || settings.currentYear
   const journals = await prisma.journalEntry.findMany({ where: { year: targetYear } })
   const totalSavings = journals.reduce((sum, j) => sum + j.savings, 0)
   
@@ -79,7 +79,7 @@ export async function getGoal(id: string) {
 
 export async function createGoal(data: GoalFormData) {
   const settings = await getSettings()
-  const goalYear = data.year || (settings as any).currentYear || new Date().getFullYear()
+  const goalYear = data.year || settings.currentYear || new Date().getFullYear()
   const goal = await prisma.goal.create({
     data: { ...data, deadline: data.deadline ? new Date(data.deadline) : null, year: goalYear, funded: 0 },
   })
@@ -109,7 +109,7 @@ export async function updateGoal(id: string, data: Partial<GoalFormData>) {
       type: "achievement",
       title: "Goal Completed! 🎉",
       message: `Congratulations! You've completed your goal: ${goal.title}`,
-      year: (settings as any).currentYear || new Date().getFullYear()
+      year: settings.currentYear || new Date().getFullYear()
     })
   }
   revalidatePath("/goals")
@@ -180,13 +180,44 @@ export async function getSettings() {
   try {
     let settings = await prisma.settings.findUnique({ where: { id: "default" } })
     if (!settings) {
-      settings = await prisma.settings.create({ data: { id: "default", currency: "Dh", savingsTarget: 120000 } })
+      settings = await prisma.settings.create({ 
+        data: { 
+          id: "default", 
+          currency: "Dh", 
+          savingsTarget: 120000,
+          theme: "dark",
+          reminderDay: 1,
+          userName: "Anas El Jaouhari",
+          currentYear: new Date().getFullYear(),
+          notificationsEnabled: true,
+          emailNotifications: ""
+        } 
+      })
     }
-    // Force currency to Dh
-    return { ...settings, currency: "Dh" }
+    // Force currency to Dh and ensure all fields exist
+    return { 
+      ...settings, 
+      currency: "Dh",
+      theme: settings.theme || "dark",
+      reminderDay: settings.reminderDay || 1,
+      userName: settings.userName || "Anas El Jaouhari",
+      currentYear: settings.currentYear || settings.currentYear || new Date().getFullYear(),
+      notificationsEnabled: settings.notificationsEnabled ?? true,
+      emailNotifications: settings.emailNotifications || ""
+    }
   } catch (error) {
     console.error("Error getting settings:", error)
-    return { id: "default", currency: "Dh", savingsTarget: 120000 }
+    return { 
+      id: "default", 
+      currency: "Dh", 
+      savingsTarget: 120000,
+      theme: "dark",
+      reminderDay: 1,
+      userName: "Anas El Jaouhari",
+      currentYear: settings.currentYear || new Date().getFullYear(),
+      notificationsEnabled: true,
+      emailNotifications: ""
+    }
   }
 }
 
@@ -214,7 +245,7 @@ export async function updateSettings(data: {
 export async function getDashboardStats() {
   try {
     const settings = await getSettings()
-    const year = (settings as any).currentYear || new Date().getFullYear()
+    const year = settings.currentYear || new Date().getFullYear()
     const [goals, journals, activities, notifications] = await Promise.all([
       prisma.goal.findMany({ where: { year } }),
       prisma.journalEntry.findMany({ where: { year }, orderBy: { month: "asc" } }),
@@ -471,7 +502,7 @@ export async function getYearData(year: number) {
 // Notification System
 export async function getNotifications(year?: number) {
   const settings = await getSettings()
-  const targetYear = year || (settings as any).currentYear || new Date().getFullYear()
+  const targetYear = year || settings.currentYear
   return prisma.notification.findMany({ 
     where: { year: targetYear }, 
     orderBy: { createdAt: "desc" },
@@ -494,7 +525,7 @@ export async function markNotificationRead(id: string) {
 
 export async function markAllNotificationsRead(year?: number) {
   const settings = await getSettings()
-  const targetYear = year || (settings as any).currentYear || new Date().getFullYear()
+  const targetYear = year || settings.currentYear
   await prisma.notification.updateMany({ where: { year: targetYear, read: false }, data: { read: true } })
   revalidatePath("/dashboard")
   revalidatePath("/settings")
@@ -511,7 +542,7 @@ export async function generateReminderNotifications() {
   if (!settings.notificationsEnabled) return
 
   const currentMonth = new Date().getMonth() + 1
-  const currentYear = (settings as any).currentYear || new Date().getFullYear()
+  const currentYear = settings.currentYear || new Date().getFullYear()
 
   // Check if journal entry exists for current month
   const journalEntry = await prisma.journalEntry.findUnique({
